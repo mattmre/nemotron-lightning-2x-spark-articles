@@ -1,4 +1,4 @@
-# NVIDIA Nemotron 3.5 Lightning 30B-A3B NVFP4 + DSpark Speculative Decoding
+# NVIDIA Nemotron 3.5 Lightning 30B-A3B NVFP4 + DSpark for DGX Spark, RTX 5090/6000 PRO
 
 <p align="center">
   <sub>by <a href="https://x.com/MiaAI_lab">Mia's AI Lab</a></sub>
