@@ -126,12 +126,14 @@ Serving capacity is a **startup-time trade-off, not a fixed constant** — every
 |---|---|
 | **KV / token pool** | **~4,926,000 tokens (~4.93M total)** |
 | KV cache memory | ~14.1 GiB |
+| Attention KV dtype | **FP8 (`e4m3fn`)** — ~3 KB/token |
+| DSpark draft KV dtype / memory | **bf16** — ~28.2 GiB (separate allocation) |
 | Weights (NVFP4 + DSpark draft) | ~21.0 GiB |
 | Mamba/SSM cache | 716 MiB (float16) |
 | **Max running requests (concurrency)** | **48** |
 | Max input length (context) | ~1,048,570 tokens (~1M per request) |
 
-**Why a 30B model fits a 1M window in ~14 GiB:** the model is hybrid — of its 52 layers, only 6 are full attention layers (23 Mamba-2 SSM + 23 MoE + 6 attention). Attention layers pay a per-token K/V cost that grows with sequence length; the Mamba state is a fixed 716 MiB. The token pool counts the shared paged cache across all layers, so the ~4.93M budget covers the 6 attention layers' K/V plus the Mamba cache for **all concurrent requests combined** — you get roughly 4–5 simultaneous full 1M-token contexts, or far more shorter ones.
+**Why a 30B model fits a 1M window in ~14 GiB:** the model is hybrid — of its 52 layers, only 6 are full attention layers (23 Mamba-2 SSM + 23 MoE + 6 attention). Attention layers pay a per-token K/V cost that grows with sequence length; the Mamba state is a fixed 716 MiB. The token pool counts the shared paged cache across all layers, so the ~4.93M budget covers the 6 attention layers' K/V plus the Mamba cache for **all concurrent requests combined** — you get roughly 4–5 simultaneous full 1M-token contexts, or far more shorter ones. (The main model's attention K/V is stored in **FP8 `e4m3fn`** — ~3 KB/token — which is what makes ~4.93M tokens fit in ~14 GiB; the DSpark draft model keeps its own separate **bf16** KV cache of ~28 GiB on top of that.)
 
 **You can change all of this — and on smaller GPUs you must.** Set env vars before `./start.sh` (restart required):
 
@@ -268,6 +270,7 @@ Set `"stream": true` in the request to enable token streaming (SGLang supports O
 
 ```text
 --mamba-ssm-dtype float16
+--kv-cache-dtype auto         # resolves to FP8 e4m3fn for the target model
 --mem-fraction-static 0.78
 --cuda-graph-max-bs-decode 4
 --reasoning-parser nemotron_3
