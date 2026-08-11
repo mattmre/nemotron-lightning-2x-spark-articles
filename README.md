@@ -127,6 +127,46 @@ All settings are configurable via environment variables:
 
 The script auto-detects host RAM and warns if below DGX Spark class (~119 GiB). For systems with less memory, consider reducing `MEM_FRACTION_STATIC`.
 
+### KV cache, concurrency & tuning
+
+Serving capacity is a **startup-time trade-off, not a fixed constant** — and all the numbers below are *changeable*. They were measured on a running DGX Spark (GB10) with the stock settings (`MEM_FRACTION_STATIC=0.78`, `CUDA_GRAPH_MAX_BS_DECODE=4`, `DSPARK_BLOCK_SIZE=3`), so they reflect *this machine*, not a promise from the GPU:
+
+| Value | Default (DGX Spark / GB10, mem-fraction 0.78) |
+|---|---|
+| **KV / token pool** | **~4,926,000 tokens (~4.93M total)** |
+| KV cache memory | ~14.1 GiB |
+| Weights (NVFP4 + DSpark draft) | ~21.0 GiB |
+| Mamba/SSM cache | 716 MiB (float16) |
+| **Max running requests (concurrency)** | **48** |
+| Max input length (context) | ~1,048,570 tokens (~1M per request) |
+
+A note on why this works: the model is a **Mamba-2 + attention hybrid** (23 Mamba layers, only 6 attention layers), so only the attention layers pay a per-token K/V cost — the Mamba state is a fixed 716 MiB. That is how a 30B model fits a 1M-token window in ~14 GiB of cache.
+
+**You can change all of this — you often must on smaller GPUs.** Every knob is an environment variable set *before* `./start.sh` (a restart is required):
+
+```bash
+# Shrink the footprint on a GPU with less memory (see RTX 5090 note below):
+MEM_FRACTION_STATIC=0.40 CUDA_GRAPH_MAX_BS_DECODE=2 ./start.sh
+
+# Or grow cache/concurrency on a memory-rich machine:
+MEM_FRACTION_STATIC=0.85 ./start.sh
+```
+
+- **`MEM_FRACTION_STATIC`** (default `0.78`) — the **GPU memory utilization knob**: the fraction of device memory reserved for the static pool (weights + KV cache + CUDA-graph scratch). **This is the main lever for both KV cache size and concurrency** — the token pool and `max_running_requests` scale roughly with it. `0.78` is tuned for the 128 GiB unified-memory GB10; lower it to cut memory usage.
+- **`CUDA_GRAPH_MAX_BS_DECODE`** (default `4`) — CUDA-graph batch-size cap for decode. Lowering it saves graph-scratch memory and is also a decode-concurrency cap.
+- **`DSPARK_BLOCK_SIZE`** (default `3`) — DSpark draft block size (performance knob, not memory).
+
+`max_running_requests` (48) is derived from the cache budget at startup, so it follows `MEM_FRACTION_STATIC` automatically. To cap it explicitly, add SGLang's `--max-running-requests N` to the `sglang serve` command in `start.sh`. To see what the running server actually allocated, query its own report:
+
+```bash
+curl -s http://127.0.0.1:8888/get_server_info | python3 -c \
+"import sys,json; d=json.load(sys.stdin); m=d['internal_states'][0]['memory_usage'];\
+print('pool tokens:', m['token_capacity']); print('kv cache GiB:', m['kvcache']);\
+print('weights GiB:', m['weight']); print('max running:', d['max_running_requests'])"
+```
+
+> **⚠️ RTX 5090 — the default settings will NOT work as-is.** The defaults assume a DGX Spark's 128 GiB unified memory. The RTX 5090 has only **32 GiB GDDR7**, and the RTX 6000 PRO cards have 48–96 GiB depending on variant. With `MEM_FRACTION_STATIC=0.78`, SGLang tries to hold the ~21 GiB of weights + CUDA-graph scratch *and* reserve 78% of a 32 GiB heap — it will either OOM at startup or leave a near-zero KV cache. **You must lower `MEM_FRACTION_STATIC`** (start around `0.30`–`0.45`) and keep `CUDA_GRAPH_MAX_BS_DECODE` low (e.g. `2`). Expect a far smaller KV pool and much lower concurrency than the DGX Spark table above — on a 32 GiB card the ~16 GiB of weights leaves only single-digit GiB for the cache, so plan for roughly ~100K–1M tokens of pool and low single-digit concurrency. Start small, watch the startup log, and use the report command above to see the real numbers instead of guessing. RTX 6000 PRO (48/96 GiB) lands in between: scale `MEM_FRACTION_STATIC` accordingly and check the report.
+
 ## Repository Structure
 
 ```
