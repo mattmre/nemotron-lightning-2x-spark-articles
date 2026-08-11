@@ -1,9 +1,11 @@
 # NVIDIA Nemotron 3.5 Lightning 30B-A3B NVFP4 + DSpark Speculative Decoding
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Docker](https://img.shields.io/badge/docker-required-blue.svg)](https://www.docker.com/)
-[![NVIDIA](https://img.shields.io/badge/NVIDIA-GPU-orange.svg)](https://nvidia.com)
+<p align="center">
+  <sub>by <a href="https://x.com/MiaAI_lab">Mia's AI Lab</a></sub>
+  <br><br>
+  <a href="https://ko-fi.com/Z8Z3SPLOD" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin:0 8px;vertical-align:middle;"><img src="https://storage.ko-fi.com/cdn/kofi6.png?v=6" alt="Buy Me a Coffee at ko-fi.com" height="28" style="height:28px;width:auto;vertical-align:middle;border:0;" /></a>
+  <a href="https://x.com/MiaAI_lab" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin:0 8px;vertical-align:middle;"><img src="https://img.shields.io/badge/Follow%20me%20on%20X-000000?style=for-the-badge&logo=x&logoColor=white" alt="Follow Mia on X" height="28" style="height:28px;width:auto;vertical-align:middle;border:0;" /></a>
+</p>
 
 This repository provides a complete setup for running **NVIDIA Nemotron 3.5 Lightning 30B-A3B NVFP4** with **DSpark speculative decoding** on **DGX Spark** platforms (GB10 / SM121), and also on **RTX 5090** and **RTX 6000 PRO** (Ada or Blackwell).
 
@@ -93,7 +95,7 @@ Based on `~/.pi/agent/models.json` (`nemotron35-lightning-local` config):
 
 **Base URL**: `http://127.0.0.1:8888/v1`
 
-### Help
+## Help
 
 ```bash
 ./start.sh --help
@@ -164,10 +166,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - NVIDIA for the Nemotron model family
 - SGLang team for the DSpark speculative decoding and cookbook recipes
 - DGX Spark platform for the unified memory architecture
-
-## Special Thanks
-
-Special thanks to **[Mia's AI Lab](https://x.com/MiaAI_lab)** for the DGX Spark deployment patterns.
-
-- [Buy Me a Coffee](https://ko-fi.com/Z8Z3SPLOD)
-- [Follow on X](https://x.com/MiaAI_lab)
