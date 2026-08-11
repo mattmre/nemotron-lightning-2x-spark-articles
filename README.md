@@ -164,3 +164,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - NVIDIA for the Nemotron model family
 - SGLang team for the DSpark speculative decoding and cookbook recipes
 - DGX Spark platform for the unified memory architecture
+
+## 🤝 Special Thanks
+
+Special thanks to **[Mia's AI Lab](https://x.com/MiaAI_lab)** for the DGX Spark deployment patterns.
+
+- [Buy Me a Coffee](https://ko-fi.com/Z8Z3SPLOD)
+- [Follow on X](https://x.com/MiaAI_lab)
