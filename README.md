@@ -16,7 +16,7 @@ This repository provides a complete setup for running **NVIDIA Nemotron 3.5 Ligh
 - **Comprehensive environment management** — Automatic model caching, memory configuration, and prerequisite checks
 - **DGX Spark optimized** — Tuned for GB10/SM121 unified memory architecture
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Docker** installed and running
 - **NVIDIA driver** on the host (nvidia-smi must work)
@@ -25,7 +25,7 @@ This repository provides a complete setup for running **NVIDIA Nemotron 3.5 Ligh
 - **≥ 30 GiB free disk space** for model weights and Docker image
 - **GPU**: NVIDIA GB10 / SM121 (DGX Spark), RTX 5090, RTX 6000 PRO (Ada or Blackwell)
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### 1. Clone the repository
 
@@ -61,7 +61,7 @@ Or if bound to all interfaces:
 http://0.0.0.0:8888/v1
 ```
 
-## 💻 Usage
+## Usage
 
 ### Basic inference
 
@@ -107,7 +107,7 @@ Download models without starting the server:
 ./start.sh --download-only
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 All settings are configurable via environment variables:
 
@@ -125,7 +125,7 @@ All settings are configurable via environment variables:
 
 The script auto-detects host RAM and warns if below DGX Spark class (~119 GiB). For systems with less memory, consider reducing `MEM_FRACTION_STATIC`.
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 .
@@ -136,7 +136,7 @@ The script auto-detects host RAM and warns if below DGX Spark class (~119 GiB). 
 └── README.md             # This file
 ```
 
-## 🏗️ Technical Details
+## Technical Details
 
 - **Model**: `nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-NVFP4`
 - **Draft model**: `nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-NVFP4-DSpark`
@@ -149,23 +149,23 @@ The script auto-detects host RAM and warns if below DGX Spark class (~119 GiB). 
   - `--reasoning-parser nemotron_3` — reasoning parser
   - `--tool-call-parser qwen3_coder` — tool call parser
 
-## 🤝 Credits
+## Credits
 
 - Recipe and guidance: [SGLang cookbook - Nemotron 3.5 Lightning](https://docs.sglang.io/cookbook/nemotron3-5-lightning)
 - Model: NVIDIA Nemotron 3.5 Lightning 30B-A3B
 - DSpark speculative decoding: SGLang project
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - NVIDIA for the Nemotron model family
 - SGLang team for the DSpark speculative decoding and cookbook recipes
 - DGX Spark platform for the unified memory architecture
 
-## 🤝 Special Thanks
+## Special Thanks
 
 Special thanks to **[Mia's AI Lab](https://x.com/MiaAI_lab)** for the DGX Spark deployment patterns.
 
