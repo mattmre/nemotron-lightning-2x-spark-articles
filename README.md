@@ -5,13 +5,9 @@
 [![Docker](https://img.shields.io/badge/docker-required-blue.svg)](https://www.docker.com/)
 [![NVIDIA](https://img.shields.io/badge/NVIDIA-GPU-orange.svg)](https://nvidia.com)
 
-## 🚀 Overview
-
 This repository provides a complete setup for running **NVIDIA Nemotron 3.5 Lightning 30B-A3B NVFP4** with **DSpark speculative decoding** on **DGX Spark** platforms (GB10 / SM121), and also on **RTX 5090** and **RTX 6000 PRO** (Ada or Blackwell).
 
-The setup uses the [SGLang cookbook recipe](https://docs.sglang.io/cookbook/nemotron3-5-lightning) and deploys the model via a prebuilt Docker image. DSpark speculative decoding enables faster token generation by using a lightweight draft model to predict multiple tokens per decode step.
-
-## ✨ Features
+## Features
 
 - **NVFP4 quantization** — 30B parameter model with reduced memory footprint
 - **DSpark speculative decoding** — Significant speedup over standard decoding
