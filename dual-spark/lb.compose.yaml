@@ -1,0 +1,8 @@
+name: nemotron-articles-lb
+services:
+  lb:
+    image: nginx:1.27-alpine
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ./nginx.generated.conf:/etc/nginx/nginx.conf:ro

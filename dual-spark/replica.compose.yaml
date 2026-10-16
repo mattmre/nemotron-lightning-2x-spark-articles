@@ -1,0 +1,56 @@
+name: nemotron-articles-replica
+services:
+  replica:
+    image: vllm/vllm-openai:v0.27.1
+    gpus: all
+    shm_size: 16gb
+    restart: unless-stopped
+    environment:
+      HF_HUB_OFFLINE: "1"
+    volumes:
+      - "${HF_HUB_CACHE:?Set an absolute local HF_HUB_CACHE}:/models/hub:ro"
+    ports:
+      - "${BIND_IP:?Set the intended loopback or private bind IP}:${BACKEND_PORT:?Set backend port}:8000"
+    command:
+      - /models/hub/models--nvidia--NVIDIA-Nemotron-3.5-Lightning-30B-A3B-NVFP4/snapshots/cc84af2fe71647d87f4486c064f320e1e7535243
+      - --served-model-name
+      - nemotron-lightning
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --moe-backend
+      - marlin
+      - --kv-cache-dtype
+      - fp8
+      - --enable-prefix-caching
+      - --gpu-memory-utilization
+      - "0.45"
+      - --max-model-len
+      - "32768"
+      - --max-num-seqs
+      - "${MAX_NUM_SEQS:?Set 10 on head and 12 on worker}"
+      - --enforce-eager
+      - --max-num-batched-tokens
+      - "8192"
+      - --mamba-backend
+      - flashinfer
+      - --mamba-cache-mode
+      - align
+      - --reasoning-parser
+      - nemotron_v3
+      - --tool-call-parser
+      - qwen3_coder
+      - --enable-auto-tool-choice
+      - --speculative_config.method
+      - dspark
+      - --speculative_config.model
+      - /models/hub/models--nvidia--NVIDIA-Nemotron-3.5-Lightning-30B-A3B-NVFP4-DSpark/snapshots/8a0177116d138011e63103110f136ec0ca09ebbf
+      - --speculative_config.num_speculative_tokens
+      - "3"
+    healthcheck:
+      test: [CMD, python3, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"]
+      interval: 15s
+      timeout: 10s
+      start_period: 15m
+      retries: 4

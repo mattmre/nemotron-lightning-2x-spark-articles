@@ -2,3 +2,14 @@
 .sglang.log
 .sglang.pid
 *.pid
+
+# Local deployment data and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log
+__pycache__/
+*.pyc
+dual-spark/nginx.generated.conf
